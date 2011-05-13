@@ -1,0 +1,44 @@
+<?php
+
+/**
+ * CTools plugin API hook for Context.
+ */
+function context_theme_variables_context_plugins() {
+  $plugins = array();
+
+  $plugins['context_reaction_theme_variables'] = array(
+    'handler' => array(
+      'path' => drupal_get_path('module', 'context_theme_variables') .'/plugins',
+      'file' => 'context_reaction_theme_variables.inc',
+      'class' => 'context_reaction_theme_variables',
+      'parent' => 'context_reaction',
+    ),
+  );
+  
+  return $plugins;
+}
+
+/**
+ * Implements hook_context_registry().
+ */
+function context_theme_variables_context_registry() {
+  return array(
+    'reactions' => array(
+      'theme_variables' => array(
+        'title' => t('Theme variables'),
+        'description' => t('Change the theme variables set.'),
+        'plugin' => 'context_reaction_theme_variables',
+      ),
+    ),
+  );
+}
+
+/**
+ * Implements of template_preprocess_page().
+ */
+function context_theme_variables_preprocess_page(&$vars) {
+  $map = context_reactions();
+  if (!empty($map['theme_variables']) && $plugin = context_get_plugin('reaction', 'theme_variables')) {
+    $plugin->execute($vars);
+  }
+}
